@@ -47,23 +47,23 @@ if __name__ == "__main__":
 
         # Read file
         print(photo_path, flush=True)
-        img = cv2.imread(photo_path, 0)
-        output_img = cv2.imread(photo_path, 1)
+        img = cv2.imread(photo_path, cv2.IMREAD_GRAYSCALE)
+        img_color = cv2.imread(photo_path, cv2.IMREAD_COLOR)
 
         # Perform edge detection
-        max_radius = int(output_img.shape[0] / 4)
-        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, 20,
+        max_radius = int(img.shape[0] / 4)
+        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, 30,
                 param1=high_threshold, param2=low_threshold, minRadius=0, maxRadius=max_radius)
         if circles is not None:
             circles = np.round(circles[0, :]).astype("int")
             for circle in circles:
-                cv2.circle(output_img,(circle[0],circle[1]),2,(0,0,255),3) # Draw the center
-                cv2.circle(output_img,(circle[0],circle[1]),circle[2],(0,255,0),2) # Draw the radius
+                cv2.circle(img_color,(circle[0],circle[1]),2,(0,0,255),3) # Draw the center
+                cv2.circle(img_color,(circle[0],circle[1]),circle[2],(0,255,0),2) # Draw the radius
 
         # Save file
         new_file_path = os.path.join(output_folder, photo_name)
         print(f"Storing new file in : {new_file_path}")
-        cv2.imwrite(new_file_path, output_img)
+        cv2.imwrite(new_file_path, img_color)
 
         # Create, and send out new fragment
         file_desc = LocalFileDesc(name="_".join(["hough_transform", photo_name]), path=new_file_path)
