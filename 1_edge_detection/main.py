@@ -9,6 +9,20 @@ from pyterum import env
 import cv2
 import numpy as np
 
+def timing(previous_time:int, message:str):
+    stopping_time = time.time_ns()
+    seconds = (stopping_time - previous_time) // 1000000000
+    minutes = seconds // 60
+    hours = minutes // 60
+    minutes -= hours * 60
+    seconds -= ((hours * 60 + minutes) * 60)
+    print(message)
+    print(f"{hours} hours, {minutes} minutes and {seconds} seconds")
+    if seconds+hours+minutes == 0:
+        milliseconds = (stopping_time - starting_time) // 1000000
+        print(f"and {milliseconds} milliseconds")
+    return stopping_time
+
 if __name__ == "__main__":
     # Setup
     ts_in = TransformationStepInput()
@@ -16,11 +30,11 @@ if __name__ == "__main__":
 
     passed_fragments = 0
     starting_time = time.time_ns()
-
     output_folder = os.path.join(env.DATA_VOLUME_PATH, "output")
 
     # For each message inbound from the sidecar
     for input_msg in ts_in.consumer():
+        fragment_start_time = time.time_ns()
         # If it is the kill message, finalize the process here
         if input_msg == None:
             print(f"Transformation step received kill message, stopping...", flush=True)
@@ -61,30 +75,11 @@ if __name__ == "__main__":
         # Setup for next iteration
         passed_fragments += 1
 
-        stopping_time = time.time_ns()
-        seconds = (stopping_time - starting_time) // 1000000000
-        minutes = seconds // 60
-        hours = minutes // 60
-        minutes -= hours * 60
-        seconds -= ((hours * 60 + minutes) * 60)
-
-        print(f"Transformation step finished processing fragment...")
-        print(f"Processed a total of {passed_fragments} fragments")
-        print(f"Ran for {hours} hours, {minutes} minutes and {seconds} seconds")
+        fragment_end_time = timing(fragment_start_time, "Transformation step finished processing fragment...")
+        print(f"Processed a {passed_fragments} fragments so far")
         print(f"Waiting for next fragment..")
 
+
     # Finalize the transformation step by doing some final assertions and generating some statistics
-    stopping_time = time.time_ns()
-    seconds = (stopping_time - starting_time) // 1000000000
-    minutes = seconds // 60
-    hours = minutes // 60
-    minutes -= hours * 60
-    seconds -= ((hours * 60 + minutes) * 60)
-
-    print(f"Transformation step finishing up...")
+    stopping_time = timing(starting_time, "Transformation step finishing up...")
     print(f"Processed a total of {passed_fragments} fragments")
-    print(f"Ran for {hours} hours, {minutes} minutes and {seconds} seconds")
-
-    if seconds+hours+minutes == 0:
-        milliseconds = (stopping_time - starting_time) // 1000000
-        print(f"Ran for {milliseconds} milliseconds")
