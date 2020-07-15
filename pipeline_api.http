@@ -27,9 +27,9 @@ content-type: application/json
             "input_channel": "fragmenter_output", 
             "output_channel": "edge_detection_output",
             "config": {
-                "BLUR_KERNEL_SIZE": 5,
-                "H_THRESHOLD1": 150,
-                "H_THRESHOLD2": 350
+                "BLUR_KERNEL_SIZE": 3,
+                "H_THRESHOLD1": 320,
+                "H_THRESHOLD2": 220,
             }
         },
         {
@@ -38,8 +38,8 @@ content-type: application/json
             "input_channel": "edge_detection_output", 
             "output_channel": "hough_transform_output",
             "config": {
-                "HIGH_THRESHOLD": 1,
-                "LOW_THRESHOLD": 22
+                "HIGH_THRESHOLD": 20,
+                "LOW_THRESHOLD": 20
             }
         }
     ],

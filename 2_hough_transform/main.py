@@ -48,9 +48,9 @@ if __name__ == "__main__":
         img_color = cv2.imread(photo_path, cv2.IMREAD_COLOR)
 
         # Perform edge detection
-        min_radius = int(sqrt(img.shape[0]**2 + img.shape[1]**2) / 16)
-        max_radius = int(sqrt(img.shape[0]**2 + img.shape[1]**2) / 6)
-        min_dist = int(sqrt(img.shape[0]**2 + img.shape[1]**2) / 20)
+        min_radius = int(sqrt(img.shape[0]**2 + img.shape[1]**2) / 30)
+        max_radius = int(sqrt(img.shape[0]**2 + img.shape[1]**2) / 12)
+        min_dist = int(sqrt(img.shape[0]**2 + img.shape[1]**2) / 40)
         circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, dp=1, minDist=min_dist,
                 param1=high_threshold, param2=low_threshold, minRadius=min_radius, maxRadius=max_radius)
         if circles is not None:

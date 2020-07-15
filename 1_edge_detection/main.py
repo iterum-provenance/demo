@@ -45,9 +45,9 @@ if __name__ == "__main__":
         photo_path = file_desc.path
 
         # Process image
-        img = cv2.imread(photo_path, 1)
-        blurred_img = cv2.medianBlur(img, blur_kernel_size)
-        edges = cv2.Canny(blurred_img, h_threshold1, h_threshold2)
+        img = cv2.imread(photo_path, cv2.IMREAD_GRAYSCALE)
+        blurred = cv2.medianBlur(img, blur_kernel_size)
+        edges = cv2.Canny(blurred, h_threshold1, h_threshold2)
 
         # Save file
         new_file_path = os.path.join(output_folder, photo_name)
