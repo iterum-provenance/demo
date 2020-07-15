@@ -9,20 +9,6 @@ from pyterum import env
 import cv2
 import numpy as np
 
-def timing(previous_time:int, message:str):
-    stopping_time = time.time_ns()
-    seconds = (stopping_time - previous_time) // 1000000000
-    minutes = seconds // 60
-    hours = minutes // 60
-    minutes -= hours * 60
-    seconds -= ((hours * 60 + minutes) * 60)
-    print(message)
-    print(f"{hours} hours, {minutes} minutes and {seconds} seconds")
-    if seconds+hours+minutes == 0:
-        milliseconds = (stopping_time - starting_time) // 1000000
-        print(f"and {milliseconds} milliseconds")
-    return stopping_time
-
 if __name__ == "__main__":
     # Setup
     ts_in = TransformationStepInput()
@@ -30,12 +16,12 @@ if __name__ == "__main__":
 
     passed_fragments = 0
     starting_time = time.time_ns()
+
     output_folder = os.path.join(env.DATA_VOLUME_PATH, "output")
     os.mkdir(output_folder)
 
     # For each message inbound from the sidecar
     for input_msg in ts_in.consumer():
-        fragment_start_time = time.time_ns()
         # If it is the kill message, finalize the process here
         if input_msg == None:
             print(f"Transformation step received kill message, stopping...", flush=True)
@@ -60,15 +46,25 @@ if __name__ == "__main__":
         img = cv2.imread(photo_path, 0)
 
         # Perform edge detection
-        edges = cv2.Canny(img, 100, 200)
+
+        cimg = img
+        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1,20,
+                param1=50, param2=30, minRadius=0, maxRadius=0)
+        print(circles)
+        circles = np.uint16(np.around(circles))
+        for circle in circles[0,:]:
+            # Draw the center
+            cv2.circle(cimg,(circle[0],circle[1]),2,(0,0,255),3)
+            # Draw the radius
+            cv2.circle(cimg,(circle[0],circle[1]),circle[2],(0,255,0),2)
 
         # Save file
         new_file_path = os.path.join(output_folder, photo_name)
         print(f"Storing new file in : {new_file_path}")
-        cv2.imwrite(new_file_path, edges)
+        cv2.imwrite(new_file_path, cimg)
 
         # Create, and send out new fragment
-        file_desc = LocalFileDesc(name="_".join(["edges", photo_name]), path=new_file_path)
+        file_desc = LocalFileDesc(name="_".join(["hough_transform", photo_name]), path=new_file_path)
         new_fragment = LocalFragmentDesc(files=[file_desc], predecessors=[input_msg.metadata.fragment_id])
         ts_out.produce(new_fragment)
         ts_out.done_with(input_msg)
@@ -76,11 +72,30 @@ if __name__ == "__main__":
         # Setup for next iteration
         passed_fragments += 1
 
-        fragment_end_time = timing(fragment_start_time, "Transformation step finished processing fragment...")
-        print(f"Processed a {passed_fragments} fragments so far")
+        stopping_time = time.time_ns()
+        seconds = (stopping_time - starting_time) // 1000000000
+        minutes = seconds // 60
+        hours = minutes // 60
+        minutes -= hours * 60
+        seconds -= ((hours * 60 + minutes) * 60)
+
+        print(f"Transformation step finished processing fragment...")
+        print(f"Processed a total of {passed_fragments} fragments")
+        print(f"Ran for {hours} hours, {minutes} minutes and {seconds} seconds")
         print(f"Waiting for next fragment..")
 
-
     # Finalize the transformation step by doing some final assertions and generating some statistics
-    stopping_time = timing(starting_time, "Transformation step finishing up...")
+    stopping_time = time.time_ns()
+    seconds = (stopping_time - starting_time) // 1000000000
+    minutes = seconds // 60
+    hours = minutes // 60
+    minutes -= hours * 60
+    seconds -= ((hours * 60 + minutes) * 60)
+
+    print(f"Transformation step finishing up...")
     print(f"Processed a total of {passed_fragments} fragments")
+    print(f"Ran for {hours} hours, {minutes} minutes and {seconds} seconds")
+
+    if seconds+hours+minutes == 0:
+        milliseconds = (stopping_time - starting_time) // 1000000
+        print(f"Ran for {milliseconds} milliseconds")
