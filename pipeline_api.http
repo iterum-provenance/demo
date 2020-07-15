@@ -1,6 +1,6 @@
 @address = http://localhost:3001
-@container_registry = localhost:32000
-# @container_registry = registry.localhost:5000
+# @container_registry = localhost:32000
+@container_registry = registry.localhost:5000
 # @container_registry = eu.gcr.io
 
 
@@ -13,8 +13,8 @@ content-type: application/json
 
 {
     "name": "demo-pipeline",
-    "input_dataset": "test-dataset",
-    "input_dataset_commit_hash": "AHDSbHhTrBG3xRdHIo6rWOzzh8NJVowb",
+    "input_dataset": "demo-cats",
+    "input_dataset_commit_hash": "hzlgZegrKX2CAyMZOqiMoScSeOdaJPOr",
     "fragmenter": {
         "image": "{{ container_registry }}/iterum/demo-fragmenter:latest",
         "output_channel": "edge_detection_input"
@@ -26,8 +26,9 @@ content-type: application/json
             "input_channel": "edge_detection_input", 
             "output_channel": "edge_detection_output",
             "config": {
-                "H_THRESHOLD1": 100,
-                "H_THRESHOLD2": 200
+                "BLUR_KERNEL_SIZE": 5,
+                "H_THRESHOLD1": 150,
+                "H_THRESHOLD2": 350
             }
         },
         {
@@ -36,7 +37,8 @@ content-type: application/json
             "input_channel": "edge_detection_output", 
             "output_channel": "hough_transform_output",
             "config": {
-                "BLUR_KERNEL_SIZE": 5
+                "HIGH_THRESHOLD": 30,
+                "LOW_THRESHOLD": 25
             }
         }
     ],

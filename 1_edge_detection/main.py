@@ -33,8 +33,9 @@ if __name__ == "__main__":
     output_folder = os.path.join(env.DATA_VOLUME_PATH, "output")
     os.mkdir(output_folder)
 
-    hthreshold1 = pyterum.config.get("H_THRESHOLD1")
-    hthreshold2 = pyterum.config.get("H_THRESHOLD2")
+    h_threshold1 = pyterum.config.get("H_THRESHOLD1")
+    h_threshold2 = pyterum.config.get("H_THRESHOLD2")
+    blur_kernel_size = pyterum.config.get("BLUR_KERNEL_SIZE")
 
     ########## For each message inbound from the sidecar ##########
     for input_msg in ts_in.consumer():
@@ -62,8 +63,9 @@ if __name__ == "__main__":
         photo_path = file_desc.path
 
         # Process image
-        img = cv2.imread(photo_path, 0)
-        edges = cv2.Canny(img, hthreshold1, hthreshold2)
+        img = cv2.imread(photo_path, 1)
+        blurred_img = cv2.medianBlur(img, blur_kernel_size)
+        edges = cv2.Canny(blurred_img, h_threshold1, h_threshold2)
 
         # Save file
         new_file_path = os.path.join(output_folder, photo_name)
