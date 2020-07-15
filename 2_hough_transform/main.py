@@ -46,15 +46,25 @@ if __name__ == "__main__":
         img = cv2.imread(photo_path, 0)
 
         # Perform edge detection
-        edges = cv2.Canny(img, 100, 200)
+
+        cimg = img
+        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1,20,
+                param1=50, param2=30, minRadius=0, maxRadius=0)
+        print(circles)
+        circles = np.uint16(np.around(circles))
+        for circle in circles[0,:]:
+            # Draw the center
+            cv2.circle(cimg,(circle[0],circle[1]),2,(0,0,255),3)
+            # Draw the radius
+            cv2.circle(cimg,(circle[0],circle[1]),circle[2],(0,255,0),2)
 
         # Save file
         new_file_path = os.path.join(output_folder, photo_name)
         print(f"Storing new file in : {new_file_path}")
-        cv2.imwrite(new_file_path, edges)
+        cv2.imwrite(new_file_path, cimg)
 
         # Create, and send out new fragment
-        file_desc = LocalFileDesc(name="_".join(["edges", photo_name]), path=new_file_path)
+        file_desc = LocalFileDesc(name="_".join(["hough_transform", photo_name]), path=new_file_path)
         new_fragment = LocalFragmentDesc(files=[file_desc], predecessors=[input_msg.metadata.fragment_id])
         ts_out.produce(new_fragment)
         ts_out.done_with(input_msg)
