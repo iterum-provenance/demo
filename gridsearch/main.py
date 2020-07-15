@@ -14,12 +14,13 @@ if __name__ == "__main__":
         "../../demo-cats/cats_subset/cat.9.jpg",
         "../../demo-cats/cats_subset/cat.10.jpg",
     ]
+    input_files = [input_files[0]]
     results = []
     for photo_path in input_files:
         img = cv2.imread(photo_path, 0)
 
             # Perform edge detection
-        edges = cv2.Canny(img, 100, 200)
+        edges = cv2.Canny(img, 200, 500)
 
         # Perform edge detection
 
@@ -33,5 +34,5 @@ if __name__ == "__main__":
                 cv2.circle(cimg,(circle[0],circle[1]),circle[2],(0,255,0),2) # Draw the radius
         # results.append(cimg)
 
-        cv2.imshow("output", np.hstack([img, cimg]))
+        cv2.imshow("output", np.hstack([img, edges, cimg]))
         cv2.waitKey(0)
