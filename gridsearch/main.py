@@ -14,10 +14,10 @@ if __name__ == "__main__":
         "../../demo-cats/cats_subset/cat.9.jpg",
         "../../demo-cats/cats_subset/cat.10.jpg",
     ]
-    input_files = input_files[0:1]
+    input_files = input_files[0:2]
     results = []
     for photo_path in input_files:
-        img = cv2.imread(photo_path, 1)
+        img = cv2.imread(photo_path, 0)
 
         # Perform edge detection    
         blurred_img = cv2.medianBlur(img,5)
@@ -30,7 +30,7 @@ if __name__ == "__main__":
         print(cimg.shape)
         max_radius = int(cimg.shape[0] / 4)
         circles = cv2.HoughCircles(edges, cv2.HOUGH_GRADIENT, 1, 20,
-                param1=30, param2=25, minRadius=0, maxRadius=max_radius)
+                param1=1, param2=1, minRadius=0, maxRadius=max_radius)
         if circles is not None:
             circles = np.round(circles[0, :]).astype("int")
             print(len(circles))
@@ -40,5 +40,5 @@ if __name__ == "__main__":
                 cv2.circle(cimg,(circle[0],circle[1]),circle[2],(0,255,0),2) # Draw the radius
         # results.append(cimg)
 
-        cv2.imshow("output", np.hstack([edges]))
+        cv2.imshow("output", np.hstack([img, blurred_img, edges, cimg]))
         cv2.waitKey(0)
