@@ -1,0 +1,36 @@
+@address = http://localhost:3001
+@container_registry = registry.localhost:5000
+# @container_registry = eu.gcr.io
+
+### Create new pipeline actor
+POST {{address}}/submit_pipeline_actor HTTP/1.1
+content-type: application/json
+
+{
+    "name": "demo-pipeline",
+    "input_dataset": "demo-cats",
+    "input_dataset_commit_hash": "hzlgZegrKX2CAyMZOqiMoScSeOdaJPOr",
+    "fragmenter": {
+        "image": "registry.localhost:5000/iterum/demo-fragmenter:latest",
+        "output_channel": "edge_detection_input"
+    },
+    "steps": [
+        {
+            "name": "edge-detection", 
+            "image": "registry.localhost:5000/iterum/demo-edge-detection:latest", 
+            "input_channel": "edge_detection_input", 
+            "output_channel": "edge_detection_output",
+            "config": {
+                "H_THRESHOLD1": 100,
+                "H_THRESHOLD2": 200
+            }
+        }
+    ],
+    "combiner": {
+        "input_channel": "edge_detection_output"
+    }
+}
+
+### Delete pipeline
+DELETE {{address}}/delete_pipelines HTTP/1.1
+  

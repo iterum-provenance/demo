@@ -1,0 +1,28 @@
+.PHONY: FORCE
+
+GKE_PATH=eu.gcr.io/iterum
+K3D_PATH=registry.localhost:5000/iterum
+TAG=latest
+
+
+
+build: FORCE
+	docker build -t demo-fragmenter:$(TAG) ./0_fragmenter
+	docker build -t demo-edge-detection:$(TAG) ./1_edge_detection
+
+tag-gke: FORCE
+	docker tag demo-fragmenter $(GKE_PATH)/demo-fragmenter:$(TAG)
+	docker tag demo-edge-detection $(GKE_PATH)/demo-edge-detection:$(TAG)
+
+push-gke: FORCE
+	docker push $(GKE_PATH)/demo-fragmenter:$(TAG)
+	docker push $(GKE_PATH)/demo-edge-detection:$(TAG)
+
+
+tag: FORCE
+	docker tag demo-fragmenter $(K3D_PATH)/demo-fragmenter:$(TAG)
+	docker tag demo-edge-detection $(K3D_PATH)/demo-edge-detection:$(TAG)
+
+push: FORCE
+	docker push $(K3D_PATH)/demo-fragmenter:$(TAG)
+	docker push $(K3D_PATH)/demo-edge-detection:$(TAG)
