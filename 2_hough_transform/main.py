@@ -6,6 +6,8 @@ from pyterum.local_fragment_desc import LocalFragmentDesc, LocalFileDesc
 from pyterum import env
 import pyterum
 
+from math import sqrt 
+
 import cv2
 import numpy as np
 
@@ -45,10 +47,12 @@ if __name__ == "__main__":
         img = cv2.imread(photo_path, cv2.IMREAD_GRAYSCALE)
         img_color = cv2.imread(photo_path, cv2.IMREAD_COLOR)
 
-        # Perform hough transform
-        max_radius = int(img.shape[0] / 4)
-        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, 30,
-                param1=high_threshold, param2=low_threshold, minRadius=0, maxRadius=max_radius)
+        # Perform edge detection
+        min_radius = int(sqrt(img.shape[0]**2 + img.shape[1]**2) / 16)
+        max_radius = int(sqrt(img.shape[0]**2 + img.shape[1]**2) / 6)
+        min_dist = int(sqrt(img.shape[0]**2 + img.shape[1]**2) / 20)
+        circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, dp=1, minDist=min_dist,
+                param1=high_threshold, param2=low_threshold, minRadius=min_radius, maxRadius=max_radius)
         if circles is not None:
             circles = np.round(circles[0, :]).astype("int")
             for circle in circles:

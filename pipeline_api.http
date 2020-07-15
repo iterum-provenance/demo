@@ -1,11 +1,12 @@
 @address = http://localhost:3001
-# @container_registry = localhost:32000
-@container_registry = registry.localhost:5000
+@container_registry = localhost:32000
+# @container_registry = registry.localhost:5000
 # @container_registry = eu.gcr.io
 
 
 ### Delete pipeline
 DELETE {{address}}/delete_pipelines HTTP/1.1
+
 
 ### Create new pipeline actor
 POST {{address}}/submit_pipeline_actor HTTP/1.1
@@ -13,17 +14,17 @@ content-type: application/json
 
 {
     "name": "demo-pipeline",
-    "input_dataset": "demo-cats",
-    "input_dataset_commit_hash": "hzlgZegrKX2CAyMZOqiMoScSeOdaJPOr",
+    "input_dataset": "test-dataset",
+    "input_dataset_commit_hash": "AHDSbHhTrBG3xRdHIo6rWOzzh8NJVowb",
     "fragmenter": {
         "image": "{{ container_registry }}/iterum/demo-fragmenter:latest",
-        "output_channel": "edge_detection_input"
+        "output_channel": "fragmenter_output"
     },
     "steps": [
         {
             "name": "edge-detection", 
             "image": "{{ container_registry }}/iterum/demo-edge-detection:latest", 
-            "input_channel": "edge_detection_input", 
+            "input_channel": "fragmenter_output", 
             "output_channel": "edge_detection_output",
             "config": {
                 "BLUR_KERNEL_SIZE": 5,
@@ -37,8 +38,8 @@ content-type: application/json
             "input_channel": "edge_detection_output", 
             "output_channel": "hough_transform_output",
             "config": {
-                "HIGH_THRESHOLD": 30,
-                "LOW_THRESHOLD": 25
+                "HIGH_THRESHOLD": 1,
+                "LOW_THRESHOLD": 22
             }
         }
     ],
