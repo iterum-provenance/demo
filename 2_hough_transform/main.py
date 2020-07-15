@@ -45,7 +45,7 @@ if __name__ == "__main__":
         img = cv2.imread(photo_path, cv2.IMREAD_GRAYSCALE)
         img_color = cv2.imread(photo_path, cv2.IMREAD_COLOR)
 
-        # Perform edge detection
+        # Perform hough transform
         max_radius = int(img.shape[0] / 4)
         circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, 30,
                 param1=high_threshold, param2=low_threshold, minRadius=0, maxRadius=max_radius)
