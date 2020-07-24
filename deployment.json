@@ -1,15 +1,15 @@
 {
   "name": "demo-pipeline",
-  "input_dataset": "cats-demo",
-  "input_dataset_commit_hash": "{{ dataset_commit_hash }}",
+  "input_dataset": "cats-dataset",
+  "input_dataset_commit_hash": "<YOUR-COMMIT-HASH>",
   "fragmenter": {
-    "image": "{{ container_registry }}/iterum/demo-fragmenter:demo-v1",
+    "image": "<YOUR-REGISTRY>/demo-fragmenter:demo-v1",
     "output_channel": "fragmenter_output"
   },
   "steps": [
     {
       "name": "edge-detection",
-      "image": "{{ container_registry }}/iterum/demo-edge-detection:demo-v1",
+      "image": "<YOUR-REGISTRY>/demo-edge-detection:demo-v1",
       "input_channel": "fragmenter_output",
       "output_channel": "edge_detection_output",
       "config": {
@@ -20,7 +20,7 @@
     },
     {
       "name": "hough-transform",
-      "image": "{{ container_registry }}/iterum/demo-hough-transform:demo-v1",
+      "image": "<YOUR-REGISTRY>/demo-hough-transform:demo-v1",
       "input_channel": "edge_detection_output",
       "output_channel": "hough_transform_output",
       "config": {

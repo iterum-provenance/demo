@@ -1,6 +1,9 @@
 # Demo pipeline
 
-This repository is a short tutorial/demo on how to create a simple pipeline using Iterum. For this demo, we will perform an experiment  where the eyes of cats will be detected using edge detection and a hough transform. We start with a dataset consisting of 10 cat images. The pipeline then consists of the following steps:
+This repository is a short tutorial/demo on how to create a simple pipeline using Iterum. For this demo, we will perform an experiment  where the eyes of cats will be detected using edge detection and a hough transform. Before starting, make sure the Iterum cluster is up and running, and the correct ports are opened. How the cluster can be set up can be found [here](https://github.com/iterum-provenance/cluster).
+
+
+We start with a dataset consisting of 10 cat images. The pipeline then consists of the following steps:
 
 1. Split the dataset into separate fragments
 1. Perform edge detection on the images
@@ -9,11 +12,19 @@ This repository is a short tutorial/demo on how to create a simple pipeline usin
 
 ![pipeline](images/pipeline.png)
 
+
+
 ## 1. Creating a versioned dataset
 
 To run this experiment using Iterum we first have to version the dataset. The images themselves are stored in the *images* subfolder of this repository.
 
 #### 1.1. Initializing a dataset
+First we have to create a folder for the dataset. Run
+```
+mkdir cats-dataset
+cd cats-dataset/
+```
+Then you can run
 ```
 iterum data init
 ```
@@ -25,7 +36,7 @@ Follow the instructions on what name, description and backend the dataset should
 ```
 
 #### 1.2. Creating *idv-config.yaml*
-Then we have to create the `idv-config.yaml` file in the newly created folder. 
+Then we have to edit the newly created `idv-config.yaml` file in the folder. 
 ```
 touch idv-config.yaml
 ```
@@ -34,12 +45,12 @@ Edit this file such that it contains the following text:
 name:
   cats-dataset
 daemon:
-  "http://localhost:3000/"
+  http://localhost:3000/
 backend:
   Local
 credentials:
   path:
-    "/localStorage/"
+    /localStorage/
 ```
 Be sure to replace the name of the dataset (`cats-dataset`) corresponds with the name you picked in the previous step.
 
@@ -58,7 +69,7 @@ To see the staged files
 ```
 iterum data status
 ```
-To commit this version, and upload the files, run:
+If you are satisfied with the files staged for commit, you can commit this version, and upload the files. For this, run:
 ```
 iterum data commit "10-cats" "Added 10 cats"
 ```
@@ -68,7 +79,12 @@ You have now added a new version to the dataset. Before you can run the pipeline
 ```
 iterum ls -c
 ```
-This hash can now be copied to be placed in a pipeline deployment file.
+This results in the following output:
+```
+10-cats          <HASH_CATS>
+root             <HASH_ROOT>
+```
+Take note of the `<HASH_CATS>`, which we will need for the pipeline deployment.
 
 
 ## 2. Build and push the images to a container registry available to your cluster
@@ -136,22 +152,34 @@ You can now deploy this pipeline by running
 ```
 iterum pipeline submit my_deployment.json
 ```
-This should deploy the pipeline on your Iterum cluster.
+This should deploy the pipeline on your Iterum cluster. Note that the inital pull of the images can take some time.
 
 #### 3.4 Examine the status of the pipeline
 You can examine the status of the pipeline by running  
 ```
 iterum pipeline status
 ```
+to retrieve the pipeline hash, and then running
+```
+iterum pipeline status <PIPELINE_HASH>
+```
+to retrieve the status of the pipeline.
 
 #### 3.5 Examine the results of the pipeline
 After each step has finished running, you can retrieve results of the pipeline by running:  
 ```
 iterum pipeline results
 ```
-or 
+which results in a list of results. The individual results can then be downloaded using:
 ```
-iterum pipeline lineage
+iterum pipeline download <PIPELINE_HASH> <FILE_NAME> .
+```
+
+You can download lineage information by running the following commands:
+
+```
+mkdir lineage
+iterum pipeline lineage <PIPELINE_HASH> ./lineage 
 ```
 
 ## Conclusion
