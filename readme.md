@@ -15,10 +15,14 @@ To run this experiment using Iterum we first have to version the dataset. The im
 
 #### 1.1. Initializing a dataset
 ```
-iterum init
+iterum data init
 ```
-Follow the instructions on what name the dataset should have. You can for example use the name `cats-dataset` for the dataset.
-
+Follow the instructions on what name, description and backend the dataset should have. For this tutorial, we use the following values:
+```
+    Name: cats-dataset
+    Desciption: A nice subset of our cat images
+    Backend: Local
+```
 
 #### 1.2. Creating *idv-config.yaml*
 Then we have to create the `idv-config.yaml` file in the newly created folder. 
@@ -37,23 +41,28 @@ credentials:
   path:
     "/localStorage/"
 ```
-Be sure to replace the name of the dataset (`cats-dataset`) with the name you picked in the previous step.
+Be sure to replace the name of the dataset (`cats-dataset`) corresponds with the name you picked in the previous step.
 
 #### 1.3. Syncing with the daemon
 You now have to sync the dataset with the daemon, such that the daemon is aware that this dataset exists. This can be done using the following command:
 ```
-iterum setup
+iterum data setup
 ```
 
 #### 1.4. Adding and committing the cat photos
 Now the cats can be added and committed to the dataset. Run the following command:
 ```
-iterum add -r ../cats_subset
+iterum data add -r ../cats_subset
 ```
-Followed by
+To see the staged files
 ```
-iterum commit "10-cats" "Added 10 cats"
+iterum data status
 ```
+To commit this version, and upload the files, run:
+```
+iterum data commit "10-cats" "Added 10 cats"
+```
+
 #### 1.5. Retrieving the commit hash
 You have now added a new version to the dataset. Before you can run the pipeline, you need to retrieve the correct commit hash. This can be done using the following command:
 ```
@@ -63,7 +72,7 @@ This hash can now be copied to be placed in a pipeline deployment file.
 
 
 ## 2. Build and push the images to a container registry available to your cluster
-This step depends a bit on your specific Kubernetes implementation. If a local registry does not work for you, you can always use the public Dockerhub registry for this step. Be sure to replace `<YOUR-REGISTRY>` with the url of your actual registry.
+This step depends a bit on your specific Kubernetes implementation. If a local registry does not work for you, you can always use the public Dockerhub registry for this step. Be sure to replace `<YOUR-REGISTRY>` with the url of your actual registry. (There are also images for this demo present on the Iterum DockerHub. If you want to use these, replace `<YOUR-REGISTRY>` with `iterum`, and skip to step 3).
 
 #### 2.1 Run the following commands to build the images:
 ```
@@ -125,10 +134,25 @@ Copy this json structure to a file called `my_deployment.json`, and change the f
 #### 3.3 Deploying a pipeline
 You can now deploy this pipeline by running 
 ```
-iterum pipelines deploy my_deployment.json
+iterum pipeline submit my_deployment.json
 ```
+This should deploy the pipeline on your Iterum cluster.
 
 #### 3.4 Examine the status of the pipeline
-
+You can examine the status of the pipeline by running  
+```
+iterum pipeline status
+```
 
 #### 3.5 Examine the results of the pipeline
+After each step has finished running, you can retrieve results of the pipeline by running:  
+```
+iterum pipeline results
+```
+or 
+```
+iterum pipeline lineage
+```
+
+## Conclusion
+This concludes the demo tutorial
