@@ -1,40 +1,55 @@
-@address = http://localhost:3001
-@container_registry = localhost:32000
-# @container_registry = registry.localhost:5000
+@manager_address = http://localhost:3001
+@daemon_address = http://34.95.87.66
+# @container_registry = localhost:32000
+@container_registry = registry.localhost:5000
 # @container_registry = eu.gcr.io
 
 
 ### Delete pipeline
-DELETE {{address}}/delete_pipelines HTTP/1.1
+DELETE {{manager_address}}/delete_pipelines HTTP/1.1
 
+@dataset_commit_hash = Ncpn77RzRxoWqjzbCv2fNEX6C271VD2l
+@dataset_name = cats-subset
+
+### Get data sets
+GET {{daemon_address}}/
+
+### Get version tree
+GET {{daemon_address}}/{{dataset_name}}/vtree
+
+### Get commit
+GET {{daemon_address}}/{{dataset_name}}/commit/{{dataset_commit_hash}}
+
+### Delete dataset
+DELETE {{daemon_address}}/cats-demo HTTP/1.1
 
 ### Create new pipeline actor
-POST {{address}}/submit_pipeline_actor HTTP/1.1
+POST {{manager_address}}/submit_pipeline_actor HTTP/1.1
 content-type: application/json
 
 {
     "name": "demo-pipeline",
-    "input_dataset": "test-dataset",
-    "input_dataset_commit_hash": "AHDSbHhTrBG3xRdHIo6rWOzzh8NJVowb",
+    "input_dataset": "{{ dataset_name }}",
+    "input_dataset_commit_hash": "{{ dataset_commit_hash }}",
     "fragmenter": {
-        "image": "{{ container_registry }}/iterum/demo-fragmenter:latest",
+        "image": "{{ container_registry }}/iterum/demo-fragmenter:demo-v1",
         "output_channel": "fragmenter_output"
     },
     "steps": [
         {
             "name": "edge-detection", 
-            "image": "{{ container_registry }}/iterum/demo-edge-detection:latest", 
+            "image": "{{ container_registry }}/iterum/demo-edge-detection:demo-v1", 
             "input_channel": "fragmenter_output", 
             "output_channel": "edge_detection_output",
             "config": {
                 "BLUR_KERNEL_SIZE": 3,
                 "H_THRESHOLD1": 320,
-                "H_THRESHOLD2": 220,
+                "H_THRESHOLD2": 220
             }
         },
         {
             "name": "hough-transform", 
-            "image": "{{ container_registry }}/iterum/demo-hough-transform:latest", 
+            "image": "{{ container_registry }}/iterum/demo-hough-transform:demo-v1", 
             "input_channel": "edge_detection_output", 
             "output_channel": "hough_transform_output",
             "config": {
@@ -47,3 +62,19 @@ content-type: application/json
         "input_channel": "hough_transform_output"
     }
 }
+
+### After submitting the pipeline
+@pipeline_hash = fuyllq8ehgdacrictfly6gq2aahasbn4
+
+### Get a file
+GET {{daemon_address}}/{{dataset_name}}/file/00000001_020.jpg/{{dataset_commit_hash}} HTTP/1.1
+
+### Get results for pipeline
+GET {{daemon_address}}/{{dataset_name}}/pipeline_result/{{pipeline_hash}}
+
+### Get results for pipeline
+GET {{daemon_address}}/{{dataset_name}}/pipeline_result/{{pipeline_hash}}/hough_transform_edges_00000001_020.jpg
+
+
+
+

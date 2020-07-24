@@ -3,7 +3,7 @@
 GKE_PATH=eu.gcr.io/iterum
 K3D_PATH=registry.localhost:5000/iterum
 MICROK8S_PATH=localhost:32000/iterum
-TAG=latest
+TAG=demo-v1
 
 
 

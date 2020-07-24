@@ -54,8 +54,15 @@ if __name__ == "__main__":
         cv2.imwrite(new_file_path, edges)
         print(f"Stored new file in : {new_file_path}")
 
-        # Create, and send out new fragment
-        file_desc = LocalFileDesc(name="_".join(["edges", photo_name]), path=new_file_path)
-        new_fragment = LocalFragmentDesc(files=[file_desc], predecessors=[input_msg.metadata.fragment_id])
+        # Create a new fragment
+        new_file_name = "_".join(["edges", photo_name])
+        file_desc = LocalFileDesc(name=new_file_name, path=new_file_path)
+
+        new_fragment = LocalFragmentDesc(files=[file_desc], predecessors=[])
+        new_fragment.add_predecessor(input_msg)
+
+        # Send out a new fragment
         ts_out.produce(new_fragment)
+
+        # Signal the sidecar that this message has been processed
         ts_out.done_with(input_msg)
