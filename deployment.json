@@ -3,13 +3,13 @@
   "input_dataset": "cats-dataset",
   "input_dataset_commit_hash": "<YOUR-COMMIT-HASH>",
   "fragmenter": {
-    "image": "<YOUR-REGISTRY>/demo-fragmenter:demo-v1",
+    "image": "<YOUR-REGISTRY>/demo-fragmenter:v1.0",
     "output_channel": "fragmenter_output"
   },
   "steps": [
     {
       "name": "edge-detection",
-      "image": "<YOUR-REGISTRY>/demo-edge-detection:demo-v1",
+      "image": "<YOUR-REGISTRY>/demo-edge-detection:v1.0",
       "input_channel": "fragmenter_output",
       "output_channel": "edge_detection_output",
       "config": {
@@ -20,7 +20,7 @@
     },
     {
       "name": "hough-transform",
-      "image": "<YOUR-REGISTRY>/demo-hough-transform:demo-v1",
+      "image": "<YOUR-REGISTRY>/demo-hough-transform:v1.0",
       "input_channel": "edge_detection_output",
       "output_channel": "hough_transform_output",
       "config": {
