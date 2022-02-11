@@ -38,7 +38,7 @@ Follow the instructions on what name, description and backend the dataset should
 #### 1.2. Creating *idv-config.yaml*
 Then we have to edit the newly created `idv-config.yaml` file in the folder. 
 ```
-touch idv-config.yaml
+open idv-config.yaml
 ```
 Edit this file such that it contains the following text:
 ```
@@ -77,7 +77,7 @@ iterum data commit "10-cats" "Added 10 cats"
 #### 1.5. Retrieving the commit hash
 You have now added a new version to the dataset. Before you can run the pipeline, you need to retrieve the correct commit hash. This can be done using the following command:
 ```
-iterum ls -c
+iterum data ls -c
 ```
 This results in the following output:
 ```
